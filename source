@@ -1,4 +1,76 @@
-@echo off 
+@echo off
+title Self-Updating Batch Script
+
+:: Current script version
+set "version=1.0.1"
+
+:menu
 cls
-echo hi
+echo ===============================
+echo      Self-Updating Script
+echo ===============================
+echo Current version: %version%
+echo [1] Run main function
+echo [2] Check for Updates
+echo [3] Exit
+echo ===============================
+set /p choice=Choose an option: 
+
+if "%choice%"=="1" goto main
+if "%choice%"=="2" goto update
+if "%choice%"=="3" exit
+goto menu
+
+:main
+echo Running the main function...
 pause
+goto menu
+
+:update
+echo Checking for updates...
+
+:: GitHub raw links
+set "verurl=https://raw.githubusercontent.com/mae7772/batch/refs/heads/main/version"
+set "scripturl=https://raw.githubusercontent.com/mae7772/batch/refs/heads/main/source"
+set "tempver=%temp%\latest_version.txt"
+set "tempfile=%temp%\updated_script.bat"
+
+:: Download latest version number
+powershell -Command "Invoke-WebRequest -Uri '%verurl%' -OutFile '%tempver%'" >nul 2>&1
+
+if not exist "%tempver%" (
+    echo Failed to check version.
+    pause
+    goto menu
+)
+
+set /p latest=<"%tempver%"
+del "%tempver%"
+
+echo Latest version on GitHub: %latest%
+
+if "%version%"=="%latest%" (
+    echo You already have the latest version.
+    pause
+    goto menu
+)
+
+echo A new version is available! Updating...
+
+:: Download latest script
+powershell -Command "Invoke-WebRequest -Uri '%scripturl%' -OutFile '%tempfile%'" >nul 2>&1
+
+if exist "%tempfile%" (
+    echo Update downloaded.
+    echo Replacing current script...
+    copy /y "%tempfile%" "%~f0" >nul
+    del "%tempfile%"
+    echo Update complete. Restarting script...
+    timeout /t 2 >nul
+    start "" "%~f0"
+    exit
+) else (
+    echo Failed to download update.
+    pause
+    goto menu
+)
