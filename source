@@ -1,3 +1,73 @@
 @echo off
-echo hi chat
+title Mega Utility Menu
+color 0A
+setlocal enabledelayedexpansion
+
+:menu
+cls
+echo ===============================
+echo      MEGA UTILITY MENU
+echo ===============================
+echo 1. Show Date and Time
+echo 2. Show System Info
+echo 3. List Files in Current Folder
+echo 4. Create a Folder
+echo 5. Delete a Folder
+echo 6. Open Notepad
+echo 7. Ping a Website
+echo 8. Clear Screen
+echo 9. Exit
+echo ===============================
+set /p choice=Choose an option (1-9): 
+
+if "%choice%"=="1" goto datetime
+if "%choice%"=="2" goto sysinfo
+if "%choice%"=="3" goto listfiles
+if "%choice%"=="4" goto createfolder
+if "%choice%"=="5" goto deletefolder
+if "%choice%"=="6" start notepad & goto menu
+if "%choice%"=="7" goto pingwebsite
+if "%choice%"=="8" cls & goto menu
+if "%choice%"=="9" exit
+echo Invalid choice, try again...
 pause
+goto menu
+
+:datetime
+echo Current Date and Time:
+date /t
+time /t
+pause
+goto menu
+
+:sysinfo
+echo System Information:
+systeminfo | findstr /B /C:"OS Name" /C:"OS Version" /C:"System Type"
+pause
+goto menu
+
+:listfiles
+echo Files in the current folder:
+dir /b
+pause
+goto menu
+
+:createfolder
+set /p foldername=Enter folder name to create: 
+mkdir "%foldername%"
+echo Folder "%foldername%" created.
+pause
+goto menu
+
+:deletefolder
+set /p foldername=Enter folder name to delete: 
+rmdir /s /q "%foldername%"
+echo Folder "%foldername%" deleted.
+pause
+goto menu
+
+:pingwebsite
+set /p website=Enter website or IP to ping: 
+ping %website%
+pause
+goto menu
